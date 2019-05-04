@@ -6,13 +6,14 @@
 /*   By: tegordon <tegordon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/04/24 19:53:33 by tegordon          #+#    #+#             */
-/*   Updated: 2019/04/27 21:37:32 by tegordon         ###   ########.fr       */
+/*   Updated: 2019/04/27 21:19:15 by tegordon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
 
-t_list	*node_handling(t_list **fd_list, size_t fd)
+t_list			*node_handling(t_list **fd_list, size_t fd)
 {
 	t_list			*runner;
 
@@ -29,10 +30,11 @@ t_list	*node_handling(t_list **fd_list, size_t fd)
 	return (runner->next);
 }
 
-void	full_nextline(char *wya, t_list *fd_node_ptr, char **line)
+void			full_nextline(char *wya, t_list *fd_node_ptr, char **line)
 {
 	char	*buffy;
 
+//	printf("[wya: %?]\n[fd_node_ptr: %?]\n[line: %?]\n", wya, fd_node_ptr, *line)
 	buffy = fd_node_ptr->content;
 	*wya = '\0';
 	*line = ft_strdup(fd_node_ptr->content);
@@ -40,13 +42,16 @@ void	full_nextline(char *wya, t_list *fd_node_ptr, char **line)
 	free(buffy);
 }
 
-void	eof_nextline(t_list **fd_list, t_list *fd_node_ptr, char **line)
+void			eof_nextline(t_list **fd_list, t_list *fd_node_ptr, char **line)
 {
+	printf("eof_nextline\n");
 	t_list		*tmp_runner;
 
-	*line = fd_node_ptr->content;
+	*line = ft_strdup(fd_node_ptr->content);
+	free(fd_node_ptr->content);
 	if (*fd_list == fd_node_ptr)
 	{
+		printf("eof:fd_list == nodeptr\n");
 		*fd_list = fd_node_ptr->next;
 		free(fd_node_ptr);
 		return ;
@@ -54,7 +59,7 @@ void	eof_nextline(t_list **fd_list, t_list *fd_node_ptr, char **line)
 	tmp_runner = *fd_list;
 	while (tmp_runner->next)
 	{
-		if (tmp_runner->next == fd_node_ptr)
+		if (tmp_runner->next == fd_node_ptr->next)
 		{
 			tmp_runner->next = tmp_runner->next->next;
 			free(fd_node_ptr);
@@ -64,7 +69,7 @@ void	eof_nextline(t_list **fd_list, t_list *fd_node_ptr, char **line)
 	}
 }
 
-int		is_wya(t_list **fd_list, char *wya,
+int				is_wya(t_list **fd_list, char *wya,
 							t_list *fd_node_ptr, char **line)
 {
 	if (!wya)
@@ -76,8 +81,9 @@ int		is_wya(t_list **fd_list, char *wya,
 	return (1);
 }
 
-int		get_next_line(const int fd, char **line)
+int				get_next_line(const int fd, char **line)
 {
+	printf("get_next_line\n");
 	static t_list	*fd_list;
 	t_list			*fd_node_ptr;
 	char			bowl[BUFF_SIZE + 1];
@@ -93,7 +99,7 @@ int		get_next_line(const int fd, char **line)
 		bowl[x] = '\0';
 		fd_node_ptr->content = ft_strjoinfree(fd_node_ptr->content, bowl);
 	}
-	if (((char *)fd_node_ptr->content)[0])
+	if (((char*)fd_node_ptr->content)[0])
 		return (is_wya(&fd_list, wya, fd_node_ptr, line));
 	*line = NULL;
 	return (0);
